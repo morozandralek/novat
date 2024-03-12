@@ -1,23 +1,3 @@
-def prepare_web_root_dir(project_name, git_url, branch, ozcode){
-  dir("$project_name"){
-    git credentialsId: 'ssh-jenkins-ci-user', url: "$git_url", branch: "$branch"
-    sh("""git branch --set-upstream-to=origin/${branch} ${branch}""")
-
-
-    withCredentials([sshUserPrivateKey(credentialsId: 'ssh-jenkins-ci-user', keyFileVariable: 'SSH_KEY')]) {
-      sh 'GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git submodule update --init'
-      sh 'GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git submodule foreach git pull origin master'
-      sh 'GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git submodule foreach git checkout master'
-      if ("$ozcode" == "ozcode"){
-        dir("ozcode"){
-          sh 'GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git submodule update --init'
-          sh 'GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git submodule foreach git pull origin master'
-          sh 'GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git submodule foreach git checkout master'
-        }
-      }
-    }
-  }
-}
 
 def rsync_web_root(project_name, dest_path, host){
     withCredentials([sshUserPrivateKey(credentialsId: 'ssh-jenkins-ci-user', keyFileVariable: 'SSH_KEY')]) {
